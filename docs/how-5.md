@@ -53,7 +53,10 @@
  pip install pywin32
 ```
 
-2.打开`Word`，另存为指定的`html`(这里选筛选过的html)
+2.这里主要就是通代码将`Word`另存为`html`
+
+> 打开`Word`，另存为指定的`html`(这里选筛选过的html，这样导出的html会删除一些`Word`自带的样式)
+
 ```
     try:
         pythoncom.CoInitialize()
