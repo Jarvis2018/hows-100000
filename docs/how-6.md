@@ -21,6 +21,8 @@
 
 那我们以上面这个背景下，想象一下 `Gitflow` 的作者（Vincent Driessen）是怎么想的呢？
 
+其实按照当时的互联网背景，常用的功能还是以软件为载体的，web占比还很低（web应用通常是 [持续交付](https://baike.baidu.com/item/%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/9803571?fr=aladdin) ），当时的软件迭代周期相对稳定并且长，使用 `Gitflow`
+可以解决多个特性同时进行开发的场景，并且可以保证不同特性的代码互不影响。
 
 `Gitflow` 图例：
 
@@ -112,14 +114,211 @@ develop 是和 master 并行的分支，但是一般是优先于 master 的。�
 
 3、现在新增一个收藏商品的功能；
 
-##### 第一步：检出 feature branch，命名为：feat-goodsCollect
+##### 第一步：创建 feature branch，命名为：feat-goodsCollect
+
+```shell
+# 从 develop 检出分支：feat-goodsCollect
+git checkout -b feat-goodsCollect develop
+```
+
+##### 第二步：当需求开发完毕，准备提测时
+
+```shell
+# 切换到 develop 分支
+git checkout develop
+# 合并 feat-goodsCollect 到 develop
+git merge --no-ff feat-goodsCollect
+# 删除特性分支 feat-goodsCollect
+git branch -d feat-goodsCollect
+# 推到到远端
+git push origin develop
+
+# 检出 release 分支
+git checkout -b release-1.1.0
+```
+
+##### 第三步：跟测阶段，修改 bug
+
+```shell
+# 修改了xxx bug
+...
+git commit -m '修改了xxx bug'
+...
+```
+
+##### 第四步：测试完毕，验收通过，准备上线（并且版本号等配置已修改）
+
+```shell
+# 切换到 master
+git checkout master
+# 合并 release-1.1.0 到 maser (一般建议合并后，再自测下或者让测试再点点，预防出现问题)
+git merge --no-ff release-1.1.0
+# 打 tag
+git tag -a 1.1.0
+```
+
+##### 第五步：上线完毕，同步代码，删除分支
+
+```shell
+# 把相关修改同步到 develop
+git checkout develo
+git merge --no-ff release-1.1.0
+# 删除 release 分支
+git checkout -d release-1.1.0
+```
 
 
 #### 同时有多个需求进行
 
+背景：
+
+1、该项目还是一个商城；
+
+2、目前线上版本为 1.0.0；
+
+3、现在新增一个收藏商品的功能和一个收藏店铺功能；
+
+4、但是这两个需求由于某种原因不能同时上线，但是需要同步开发。"收藏商品"先上线，"收藏店铺"第二天上线；
+
+##### 第一步：创建 feature branches：feat-goodsCollect、feat-storeCollect
+
+```shell
+# 从 develop 检出分支：feat-goodsCollect
+git checkout -b feat-goodsCollect develop
+# 从 develop 检出分支：feat-storeCollect
+git checkout -b feat-storeCollect develop
+```
+
+##### 第二步：当需求开发完毕，准备提测时
+
+> 这时就会有问题了，假如只有两个测试人员，并且每个需求的测试周期都是一天，所以领导说了，我们这两个需求要在一天内完成。
+> 但是由于是同一个项目，测试环境一般只有一套。那怎么办？
+> 
+> 1、要不就先测"收藏商品"，等没问题后再测"收藏店铺"（根据以上描述，这个方案肯定不行）
+> 
+> 2、要不就同时测这两个功能
+> 
+> 第一种情况好说，我们的 release 分支可以不同，但是实力不允许啊。所以我们以第二种为例说明
+
+```shell
+# 切换到 develop 分支
+git checkout develop
+# 合并 feat-goodsCollect 到 develop
+git merge --no-ff feat-goodsCollect
+# 删除特性分支 feat-goodsCollect
+git branch -d feat-goodsCollect
+# 推到到远端
+git push origin develop
+
+# 检出 release 分支
+git checkout -b release-1.1.0
+
+# 合并 feat-storeCollect 到 release-1.1.0
+git merge --no-ff feat-storeCollect
+```
+这里我们只创建了 release-1.1.0 ，并没有创建和"收藏店铺"有个的 release 分支，其实按照 `Gitflow` 的思想，"收藏店铺"其实此时是不算"即将上线"状态的。
+
+所以我们把 feat-storeCollect 合并到 release-1.1.0（其实`Gitflow`并没有规定这部分内容）。
+
+##### 第三步：跟测阶段，修改 bug
+
+```shell
+# 修改了xxx bug
+...
+git commit -m '修改了xxx bug'
+...
+```
+
+
+##### 第四步：测试完毕，验收通过，准备上线（并且版本号等配置已修改）
+
+> 注意：
+> 这里的操作其实就有点"骚了"，我们再合并分支前，需要将项目中有关"店铺收藏"的入口手动隐藏
+
+```shell
+# 隐藏本次不上线的功能
+git commit -m '隐藏"店铺收藏"的入口'
+
+# 切换到 master
+git checkout master
+# 合并 release-1.1.0 到 maser (一般建议合并后，再自测下或者让测试再点点，预防出现问题)
+git merge --no-ff release-1.1.0
+# 打 tag
+git tag -a 1.1.0
+```
+
+##### 第五步：上线完毕，同步代码，删除分支
+
+```shell
+# 把相关修改同步到 develop
+git checkout develo
+git merge --no-ff release-1.1.0
+# 删除 release 分支
+git checkout -d release-1.1.0
+```
+
+##### 第六步：由于第二天就要上线"店铺收藏"，所以还需要检出对应的 release-1.2.0 分支。
+
+> 此时 develop 分支其实包含了已经修复完 bug 的代码了，所以也就不需要再把 feat-goodsCollect 合到 develop 了
+
+```shell
+# 切换到 develop 分支
+git checkout develop
+# 删除特性分支 feat-storeCollect
+git branch -d feat-storeCollect
+# 推到到远端
+git push origin develop
+
+# 检出 release 分支
+git checkout -b release-1.2.0
+```
+
+##### 第七步：这里就和之前的上线步骤一样了。
+
+```shell
+# 切换到 master
+git checkout master
+# 合并 release-1.1.0 到 maser (一般建议合并后，再自测下或者让测试再点点，预防出现问题)
+git merge --no-ff release-1.2.0
+# 打 tag
+git tag -a 1.2.0
+```
+
+```shell
+# 把相关修改同步到 develop
+git checkout develo
+git merge --no-ff release-1.2.0
+# 删除 release 分支
+git checkout -d release-1.2.0
+```
+
+### 使用工具
+
+> 以上步骤都是手动执行分支的 checkout 和 merge，为了解决繁琐的步骤，我们可以使用工具或图形化完成。
+
+#### git 扩展工具 git-flow
+ [git-flow](https://www.git-tower.com/learn/git/ebook/cn/command-line/advanced-topics/git-flow/)
+，可以从这篇文章 [gitflow-workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) 查看工作原理。
+
+#### sourcetree
+
+![img.png](../assets/imgs/img.png)
+
+#### vscode 插件
+
+[GitFlow 4 Code](https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code)
+
 ## 总结
+
+首先承认 `Gitflow` 确实是个好模型，也为其他 git 模型做了基础。但毕竟它的诞生时间是在 2010 年提出的，
+在这 11 年间，web应用的兴起，互联网的初创企业越来越多，"持续交付"的模式成为主流，在某些场景下 `Gitflow`
+确实用起来很繁琐。就如同 [同时有多个需求进行](####/同时有多个需求进行) 里的两个需求在很短的时间内依次上线。
+
+那有没有一个好的 git 模型适应所有场景，反正到目前为止是没有的。但其实我们可以参考 `Gitflow` 来指定一个属于自己团队的模型。
 
 参考文章：
 * https://blog.csdn.net/weixin_43117449/article/details/84573917
 * https://nvie.com/posts/a-successful-git-branching-model/
 * https://datasift.github.io/gitflow/IntroducingGitFlow.html
+* https://www.pianshen.com/article/71331461353/
+* https://www.infoq.cn/article/i7m3UdTFLu1Lv2ai6abv
