@@ -116,13 +116,23 @@ develop 是和 master 并行的分支，但是一般是优先于 master 的。�
 
 ##### 第一步：创建 feature branch，命名为：feat-goodsCollect
 
+手动方式：
 ```shell
 # 从 develop 检出分支：feat-goodsCollect
 git checkout -b feat-goodsCollect develop
 ```
 
+git-flow 方式：
+```shell
+# 初始化（只在项目初始化是，执行一次就好）
+git flow init
+# 从 develop 检出分支：feat-goodsCollect
+git flow feature start feat-goodsCollect
+```
+
 ##### 第二步：当需求开发完毕，准备提测时
 
+手动方式：
 ```shell
 # 切换到 develop 分支
 git checkout develop
@@ -137,6 +147,14 @@ git push origin develop
 git checkout -b release-1.1.0
 ```
 
+git-flow 方式：
+```shell
+# 完成 feature 分支
+git flow feature finish feat-goodsCollect
+# 开始 release 阶段
+git flow release start 1.1.0
+```
+
 ##### 第三步：跟测阶段，修改 bug
 
 ```shell
@@ -148,6 +166,7 @@ git commit -m '修改了xxx bug'
 
 ##### 第四步：测试完毕，验收通过，准备上线（并且版本号等配置已修改）
 
+手动方式：
 ```shell
 # 切换到 master
 git checkout master
@@ -157,8 +176,14 @@ git merge --no-ff release-1.1.0
 git tag -a 1.1.0
 ```
 
+git-flow 方式：
+```shell
+git flow release finish 1.1.0
+```
+
 ##### 第五步：上线完毕，同步代码，删除分支
 
+手动方式：
 ```shell
 # 把相关修改同步到 develop
 git checkout develo
@@ -167,6 +192,7 @@ git merge --no-ff release-1.1.0
 git checkout -d release-1.1.0
 ```
 
+git-flow 方式：此时就不用手动执行了，在执行第四步的 git-flow 后就已经帮我们完成了清理操作。
 
 #### 同时有多个需求进行
 
@@ -298,7 +324,8 @@ git checkout -d release-1.2.0
 
 #### git 扩展工具 git-flow
  [git-flow](https://www.git-tower.com/learn/git/ebook/cn/command-line/advanced-topics/git-flow/)
-，可以从这篇文章 [gitflow-workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) 查看工作原理。
+，从 [同时只有一个需求进行](#同时只有一个需求进行) 里 git-flow 和手动的对比可以看出，git-flow 可以减轻我们的工作量，让我们可以更方便的使用 `Gitflow`。
+ 可以从这篇文章 [gitflow-workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) 查看工作原理。
 
 #### sourcetree
 
@@ -312,7 +339,7 @@ git checkout -d release-1.2.0
 
 首先承认 `Gitflow` 确实是个好模型，也为其他 git 模型做了基础。但毕竟它的诞生时间是在 2010 年提出的，
 在这 11 年间，web应用的兴起，互联网的初创企业越来越多，"持续交付"的模式成为主流，在某些场景下 `Gitflow`
-确实用起来很繁琐。就如同 [同时有多个需求进行](####/同时有多个需求进行) 里的两个需求在很短的时间内依次上线。
+确实用起来很繁琐。就如同 [同时有多个需求进行](#同时有多个需求进行) 里的两个需求在很短的时间内依次上线。
 
 那有没有一个好的 git 模型适应所有场景，反正到目前为止是没有的。但其实我们可以参考 `Gitflow` 来指定一个属于自己团队的模型。
 
