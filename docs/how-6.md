@@ -70,7 +70,7 @@ develop 是和 master 并行的分支，但是一般是优先于 master 的。�
 
 3、分支命名不能和主分支和其他支持分支冲突；
 
-该分支一般是在开始一个新的需求时，从 develop 检出相应的分支。当开发结束后合并到 develop 分支，并作为之后的 release 的上流分支。
+该分支一般是在开始一个新的需求时，从 develop 检出相应的分支。当开发结束并测试通过后合并到 develop 分支，并作为之后的 release 的上流分支。
 
 #### Release branches
 
@@ -80,8 +80,8 @@ develop 是和 master 并行的分支，但是一般是优先于 master 的。�
 
 3、命名规则一般：release-*；
 
-该分支是在 Feature branches 分支结束后，准备上线前的测试阶段时，从 develop 检出分支。
-并在该分支进行 bug 修复和修改相关配置（版本号、环境变量等）。注意的是，禁止在该分支添加大功能，
+该分支是在 Feature branches 分支结束后，准备上线前的阶段时，从 develop 检出分支。
+并在该分支进行突发问题的修复和修改相关配置（版本号、环境变量等）。注意的是，禁止在该分支添加大功能，
 因为这属于新特性，按理要放到下一个特性分支中进行。
 
 > release 分支的主要流程就是：开发 -> 测试 -> 修改bug -> 重新部署到测试环境 -> 再次测试。
@@ -122,15 +122,24 @@ develop 是和 master 并行的分支，但是一般是优先于 master 的。�
 git checkout -b feat-goodsCollect develop
 ```
 
-git-flow 方式：
+git-flow 方式（由于 git-flow 会自动根据支持分支特性创建对应的父级目录，所以不需要添加前缀（比如 feat-* 、release-* ）：
 ```shell
 # 初始化（只在项目初始化是，执行一次就好）
 git flow init
-# 从 develop 检出分支：feat-goodsCollect
-git flow feature start feat-goodsCollect
+# 从 develop 检出分支：-goodsCollect
+git flow feature start goodsCollect
 ```
 
-##### 第二步：当需求开发完毕，准备提测时
+##### 第二步：跟测阶段，修改 bug
+
+```shell
+# 修改了xxx bug
+...
+git commit -m '修改了xxx bug'
+...
+```
+
+##### 第三步：当 bug 修复完毕并验收通过后，准备上线时（并且版本号等配置已修改）
 
 手动方式：
 ```shell
@@ -150,21 +159,13 @@ git checkout -b release-1.1.0
 git-flow 方式：
 ```shell
 # 完成 feature 分支
-git flow feature finish feat-goodsCollect
+git flow feature finish goodsCollect
 # 开始 release 阶段
 git flow release start 1.1.0
 ```
 
-##### 第三步：跟测阶段，修改 bug
 
-```shell
-# 修改了xxx bug
-...
-git commit -m '修改了xxx bug'
-...
-```
-
-##### 第四步：测试完毕，验收通过，准备上线（并且版本号等配置已修改）
+##### 第四步：测试人员再次测试完毕，验收通过，准备上线
 
 手动方式：
 ```shell
@@ -215,18 +216,39 @@ git checkout -b feat-goodsCollect develop
 git checkout -b feat-storeCollect develop
 ```
 
-##### 第二步：当需求开发完毕，准备提测时
+##### 第二步：跟测阶段，修改 bug
 
 > 这时就会有问题了，假如只有两个测试人员，并且每个需求的测试周期都是一天，所以领导说了，我们这两个需求要在一天内完成。
 > 但是由于是同一个项目，测试环境一般只有一套。那怎么办？
-> 
+>
 > 1、要不就先测"收藏商品"，等没问题后再测"收藏店铺"（根据以上描述，这个方案肯定不行）
-> 
+>
 > 2、要不就同时测这两个功能
-> 
-> 第一种情况好说，我们的 release 分支可以不同，但是实力不允许啊。所以我们以第二种为例说明
+>
+> 第一种情况好说，我们的 feature 分支可以不同，但是实力不允许啊。所以我们以第二种为例说明
+
 
 ```shell
+# 切到 feat-goodsCollect
+git checkout feat-goodsCollect
+# 合并 feat-storeCollect 到 feat-goodsCollect
+git merge --no-ff feat-storeCollect
+
+# 修改了xxx bug
+...
+git commit -m '修改了xxx bug'
+...
+```
+
+##### 第三步：当 bug 修复完毕并验收通过后，准备上线时（并且版本号等配置已修改）
+
+> 注意：
+> 这里的操作其实就有点"骚了"，我们在合并分支前，需要将项目中有关"店铺收藏"的入口手动隐藏
+
+```shell
+# 隐藏本次不上线的功能
+git commit -m '隐藏"店铺收藏"的入口'
+
 # 切换到 develop 分支
 git checkout develop
 # 合并 feat-goodsCollect 到 develop
@@ -238,33 +260,11 @@ git push origin develop
 
 # 检出 release 分支
 git checkout -b release-1.1.0
-
-# 合并 feat-storeCollect 到 release-1.1.0
-git merge --no-ff feat-storeCollect
-```
-这里我们只创建了 release-1.1.0 ，并没有创建和"收藏店铺"有个的 release 分支，其实按照 `Gitflow` 的思想，"收藏店铺"其实此时是不算"即将上线"状态的。
-
-所以我们把 feat-storeCollect 合并到 release-1.1.0（其实`Gitflow`并没有规定这部分内容）。
-
-##### 第三步：跟测阶段，修改 bug
-
-```shell
-# 修改了xxx bug
-...
-git commit -m '修改了xxx bug'
-...
 ```
 
-
-##### 第四步：测试完毕，验收通过，准备上线（并且版本号等配置已修改）
-
-> 注意：
-> 这里的操作其实就有点"骚了"，我们再合并分支前，需要将项目中有关"店铺收藏"的入口手动隐藏
+##### 第四步：测试人员再次测试完毕，验收通过，准备上线
 
 ```shell
-# 隐藏本次不上线的功能
-git commit -m '隐藏"店铺收藏"的入口'
-
 # 切换到 master
 git checkout master
 # 合并 release-1.1.0 到 maser (一般建议合并后，再自测下或者让测试再点点，预防出现问题)
@@ -285,7 +285,7 @@ git checkout -d release-1.1.0
 
 ##### 第六步：由于第二天就要上线"店铺收藏"，所以还需要检出对应的 release-1.2.0 分支。
 
-> 此时 develop 分支其实包含了已经修复完 bug 的代码了，所以也就不需要再把 feat-goodsCollect 合到 develop 了
+> 此时 develop 分支其实包含了已经修复完 bug 的代码了，所以也就不需要再把 feat-storeCollect 合到 develop 了
 
 ```shell
 # 切换到 develop 分支
@@ -339,9 +339,18 @@ git checkout -d release-1.2.0
 
 首先承认 `Gitflow` 确实是个好模型，也为其他 git 模型做了基础。但毕竟它的诞生时间是在 2010 年提出的，
 在这 11 年间，web应用的兴起，互联网的初创企业越来越多，"持续交付"的模式成为主流，在某些场景下 `Gitflow`
-确实用起来很繁琐。就如同 [同时有多个需求进行](#同时有多个需求进行) 里的两个需求在很短的时间内依次上线。
+确实用起来很繁琐。就如同 [同时有多个需求进行](#同时有多个需求进行) 里的两个需求在很短的时间内依次上线（其实这种情况下，其他模型也未必有好的方案）。
 
 那有没有一个好的 git 模型适应所有场景，反正到目前为止是没有的。但其实我们可以参考 `Gitflow` 来指定一个属于自己团队的模型。
+
+其实 `Gitflow` 在某些具体的场景也是很模糊，比如是提测时检出 release 分支，还是在 feature 分支上提测，并测试通过后再检出 release 分支。
+如果按照 `Gitflow` 的思想的话，应该是提测时检出 release 分支，但这样可能会导致 develop 分支上包含很大 bug 的代码，如果这时从 develop 检出的
+feature 分支就会有问题（我们建议是在 feature 分支提测并测试，测试通过后再检出 release 分支）。
+
+
+还有一点是：上线时，是发布 master 还是 release 分支，在接入 CI/CD 的情况下，一般都是在 master 有 merge 或者打 tag 时触发。那我们肯定是以
+master 为上线分支了。如果没有 CI/CD 也建议用 master 做为上线分支，因为有可能在上线前，release 分支检查后，有个 hotfix 被合到了 develop 和
+master ，所以这时用 master 上线比较保险（其实也不是绝对，有可能那个 hotfix 导致了此次上线的有问题。所以 release 合到 master 后，再次回归测试下。）。
 
 参考文章：
 * https://blog.csdn.net/weixin_43117449/article/details/84573917
