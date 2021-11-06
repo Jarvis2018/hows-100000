@@ -29,9 +29,9 @@
 
 ## 总结
 
-其实原来很简单，难的是想到用 [radial-gradient](https://developer.mozilla.org/zh-CN/docs/Web/CSS/gradient/radial-gradient()) 来实现一个最小网状单元。
+其实原理很简单，难的是想到用 [radial-gradient](https://developer.mozilla.org/zh-CN/docs/Web/CSS/gradient/radial-gradient()) 来实现一个最小网状单元。
 
-一般在项目开发中，我们很少用到 `radial-gradient` 这个 css 函数，即使用到了也是实现类型平滑渐变的场景，像实现这种'实线'（相邻颜色没有渐变效果）场景很少，即使遇到了也是 UI 切图实现的。
+一般在项目开发中，我们很少用到 `radial-gradient` 这个 css 函数，即使用到了也是实现类似平滑渐变的场景，像实现这种'实线'（相邻颜色没有渐变效果）场景很少，即使遇到了也是 UI 切图实现的。
 
 ### 灵感来源
 
