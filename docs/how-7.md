@@ -53,7 +53,7 @@
     - ![img.png](../assets/imgs/img4.png)
     - ![img_1.png](../assets/imgs/img5.png)
   - 1.2 手动备份 JENKINS_HOME 对应的目录
-    - `cp -r /var/libjenkins 备份的路径`
+    - `cp -r /var/lib/jenkins 备份的路径`
   - 1.3 通过插件 [Thin Backup Plugin](https://plugins.jenkins.io/thinBackup/#releases) ，来备份全局配置和工作目录配置。
 
 - *第 2 步*：停止 Jenkins 服务
@@ -64,8 +64,18 @@
   - 3.2 找到 `JENKINS_HOME` 并修改值为你要迁移的目录
   - 3.3 保存并退出
 
-- *第 4 步*：重启 Jenkins 服务
+- *第 4 步*：将原来的目录移动到迁移的目录
+  - `mv /var/lib/jenkins 迁移的目录`
+
+- *第 5 步*：更改迁移的目录权限相关 （没有这步的话，后期在部署项目的时候可能会提示权限问题）
+  - 5.1 `chown -R jenkins:jenkins 迁移的目录`
+  - 5.2 `usermod -d 迁移的目录 jenkins`
+
+- *第 6 步*：重启 Jenkins 服务
   - `systemctl start jenkins`
+
+- *第 7 步*：删除备份目录
+  - 如何迁移成功，并且也可以构建项目，那么可以将第一步里的备份删掉了
 
 ## 总结
 
@@ -75,7 +85,9 @@
 
 3、Jenkins 服务是通过 `systemctl` 启动的。并没有用 `docker` 、 `Tomcat`，如果是以上两种方式那么操作方式是不通的哦。
 
-4、如果在重启 Jenkins 时提示 `Starting Jenkins bash: /usr/bin/java: No such file or directory`，可以手动添加 `jdk` (通过命令 `which java` 可获取) 的路径到文件 `/etc/init.d/jenkins` 中。
+4、原来的 Jenkins 主目录是在 `/var/lib/jenkins` 路径下的。
+
+5、如果在重启 Jenkins 时提示 `Starting Jenkins bash: /usr/bin/java: No such file or directory`，可以手动添加 `jdk` (通过命令 `which java` 可获取) 的路径到文件 `/etc/init.d/jenkins` 中。
 
 参考链接：
 
