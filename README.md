@@ -10,3 +10,4 @@
 - [x] [how-6](docs/how-6.md)： "十万个"怎么做：如何玩转 `Gitflow`
 - [x] [how-7](docs/how-7.md)： "十万个"怎么做：如何解决 Jenkins 提示 `... "ENOSPC: no space left on device..` 问题
 - [x] [how-8](docs/how-8.md)： "十万个"怎么做：如何用 CSS 实现一个网
+- [x] [how-9](docs/how-9.md)： "十万个"怎么做：如何实现动态设置 echarts tooltip 的内容

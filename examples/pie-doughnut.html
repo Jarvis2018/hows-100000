@@ -1,0 +1,126 @@
+<!--
+    THIS EXAMPLE WAS DOWNLOADED FROM https://echarts.apache.org/examples/zh/editor.html?c=pie-doughnut
+-->
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body style="height: 100%; margin: 0">
+  <div id="container" style="height: 100%"></div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+  <!-- Uncomment this line if you want to dataTool extension
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/extension/dataTool.min.js"></script>
+        -->
+  <!-- Uncomment this line if you want to use gl extension
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl@2/dist/echarts-gl.min.js"></script>
+        -->
+  <!-- Uncomment this line if you want to echarts-stat extension
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat@latest/dist/ecStat.min.js"></script>
+        -->
+  <!-- Uncomment this line if you want to use map
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/map/js/china.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/map/js/world.js"></script>
+        -->
+  <!-- Uncomment these two lines if you want to use bmap extension
+        <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=<Your Key Here>"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@{{version}}/dist/extension/bmap.min.js"></script>
+        -->
+
+  <script type="text/javascript">
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    var app = {};
+
+    var option;
+
+    option = {
+      legend: {
+        top: '5%',
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'item',
+        triggerOn: 'none'
+      },
+      series: [
+        {
+          name: 'Access From',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '40',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: [
+            {
+              value: 1048,
+              name: 'Search Engine',
+              tooltip: {
+              }
+            },
+            {
+              value: 735,
+              name: 'Direct',
+              tooltip: {
+              }
+            },
+            {
+              value: 580,
+              name: 'Email',
+              tooltip: {
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    function showTooltip(dataIndex, seriesIndex) {
+      myChart.dispatchAction({
+        type: 'showTip',
+        seriesIndex: seriesIndex,
+        dataIndex: dataIndex
+      });
+    }
+    function hideTooltip(dataIndex) {
+      myChart.dispatchAction({ type: 'hideTip' });
+    }
+
+    function getAsynsData() {
+      let data = Math.random() * 1000
+      return Promise.resolve(data + '')
+    }
+
+    myChart.on('mouseover', res => {
+      getAsynsData().then(data => {
+        res.data.tooltip.formatter = data
+        showTooltip(res.dataIndex, res.seriesIndex)
+      })
+    })
+    myChart.on('mouseout', res => {
+      hideTooltip()
+    })
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+  </script>
+</body>
+
+</html>
