@@ -190,7 +190,7 @@ git flow release finish 1.1.0
 git checkout develo
 git merge --no-ff release-1.1.0
 # 删除 release 分支
-git checkout -d release-1.1.0
+git branch -d release-1.1.0
 ```
 
 git-flow 方式：此时就不用手动执行了，在执行第四步的 git-flow 后就已经帮我们完成了清理操作。
@@ -280,7 +280,7 @@ git tag -a 1.1.0
 git checkout develo
 git merge --no-ff release-1.1.0
 # 删除 release 分支
-git checkout -d release-1.1.0
+git branch -d release-1.1.0
 ```
 
 ##### 第六步：由于第二天就要上线"店铺收藏"，所以还需要检出对应的 release-1.2.0 分支。
@@ -315,7 +315,7 @@ git tag -a 1.2.0
 git checkout develo
 git merge --no-ff release-1.2.0
 # 删除 release 分支
-git checkout -d release-1.2.0
+git branch -d release-1.2.0
 ```
 
 ### 使用工具
